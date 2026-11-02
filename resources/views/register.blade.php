@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KyZXEAg3QhqLMpG8r+8fhAXLRk2vvoC2f3B09zVXn8CA5QIVfZOJ3BCsw2P0p/We" crossorigin="anonymous">
+    <link rel="stylesheet" href="{{ asset('css/main.css') }}" type="text/css">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+    <title>Sign Up | CampCode</title>
+</head>
+
+<body>
+    <section class="login-user">
+        <div class="left">
+            <img src="{{ asset('images/ill_login_new.png') }}" alt="">
+        </div>
+        <div class="right">
+            <a href="{{ route('welcome') }}">
+                <img src="{{ asset('images/logo.png') }}" class="logo" alt="CampCode">
+            </a>
+            <h1 class="header-third">Create Account</h1>
+            <p class="subheader">Join today, learn something new</p>
+
+            <form action="{{ route('register.store') }}" method="POST" class="basic-form">
+                @csrf
+
+                @if ($errors->any())
+                    <div class="alert alert-danger">
+                        <ul class="mb-0 ps-3">
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
+
+                <div class="mb-3">
+                    <label for="name" class="form-label">Full Name</label>
+                    <input type="text" id="name" name="name" value="{{ old('name') }}" class="form-control" required autofocus>
+                </div>
+                <div class="mb-3">
+                    <label for="email" class="form-label">Email Address</label>
+                    <input type="email" id="email" name="email" value="{{ old('email') }}" class="form-control" required>
+                </div>
+                <div class="mb-3">
+                    <label for="occupation" class="form-label">Occupation</label>
+                    <input type="text" id="occupation" name="occupation" value="{{ old('occupation') }}" class="form-control">
+                </div>
+                <div class="mb-3">
+                    <label for="password" class="form-label">Password</label>
+                    <input type="password" id="password" name="password" class="form-control" minlength="8" required>
+                </div>
+                <div class="mb-3">
+                    <label for="password_confirmation" class="form-label">Confirm Password</label>
+                    <input type="password" id="password_confirmation" name="password_confirmation" class="form-control" minlength="8" required>
+                </div>
+                <button type="submit" class="w-100 btn btn-primary">Sign Up</button>
+                <p class="mt-3">
+                    Sudah punya akun? <a href="{{ route('login') }}">Sign In</a>
+                </p>
+            </form>
+
+            <img src="{{ asset('images/people.png') }}" class="people" alt="">
+        </div>
+    </section>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-U1DAWAznBHeqEIlVSCgzq+c9gqGAJn5c/t99JyeKa9xxaYpSvHU5awsuZVVFIhvj" crossorigin="anonymous"></script>
+</body>
+</html>

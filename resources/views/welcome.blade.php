@@ -17,7 +17,7 @@
                                 Our bootcamp is helping junior developers who <br> are really passionate in the programming.
                             </p>
                             <p class="cta">
-                                <a href="#" class="btn btn-master btn-primary">
+                                <a href="{{ auth()->check() ? '#pricing' : route('register') }}" class="btn btn-master btn-primary">
                                     Get Started
                                 </a>
                             </p>
@@ -39,7 +39,7 @@
     </section>
 
 
-    <section class="benefits">
+    <section class="benefits" id="benefits">
         <div class="container">
             <div class="row text-center pb-70">
                 <div class="col-lg-12 col-12 header-wrap">
@@ -100,7 +100,7 @@
         </div>
     </section>
 
-    <section class="steps">
+    <section class="steps" id="steps">
         <div class="container">
             <div class="row item-step pb-70">
                 <div class="col-lg-6 col-12 text-center">
@@ -117,7 +117,7 @@
                         Learn from anyone around the <br> world and get a new skills
                     </p>
                     <p class="mt-5">
-                        <a href="#" class="btn btn-master btn-secondary me-3">
+                        <a href="#steps" class="btn btn-master btn-secondary me-3">
                             Learn More
                         </a>
                     </p>
@@ -136,7 +136,7 @@
                         project
                     </p>
                     <p class="mt-5">
-                        <a href="#" class="btn btn-master btn-secondary me-3">
+                        <a href="#pricing" class="btn btn-master btn-secondary me-3">
                             View Demo
                         </a>
                     </p>
@@ -162,7 +162,7 @@
                         feedbacks
                     </p>
                     <p class="mt-5">
-                        <a href="#" class="btn btn-master btn-secondary me-3">
+                        <a href="#benefits" class="btn btn-master btn-secondary me-3">
                             Showcase
                         </a>
                     </p>
@@ -171,7 +171,7 @@
         </div>
     </section>
 
-    <section class="pricing">
+    <section class="pricing" id="pricing">
         <div class="container">
             <div class="row pb-70">
                 <div class="col-lg-5 col-12 header-wrap copywriting">
@@ -236,7 +236,7 @@
         </div>
     </section>
 
-    <section class="testimonials">
+    <section class="testimonials" id="testimonials">
         <div class="container">
             <div class="row text-center pb-70">
                 <div class="col-lg-12 col-12 header-wrap">
