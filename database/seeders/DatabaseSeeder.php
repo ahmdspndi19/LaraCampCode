@@ -11,18 +11,20 @@ class DatabaseSeeder extends Seeder
     {
         $this->call(CampSeeder::class);
 
-        User::create([
+        // is_admin tidak mass-assignable, jadi diisi lewat forceFill().
+        // Password di bawah hanya untuk development. Ganti sebelum deploy.
+        $admin = User::firstOrNew(['email' => 'admin@campcode.test']);
+        $admin->forceFill([
             'name' => 'Admin',
-            'email' => 'admin@campcode.test',
             'password' => 'password',
             'is_admin' => true,
-        ]);
+        ])->save();
 
-        User::create([
+        $user = User::firstOrNew(['email' => 'user@campcode.test']);
+        $user->forceFill([
             'name' => 'Beatrice',
-            'email' => 'user@campcode.test',
             'password' => 'password',
             'occupation' => 'Product Manager',
-        ]);
+        ])->save();
     }
 }

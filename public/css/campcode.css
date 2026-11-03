@@ -1,0 +1,52 @@
+/* Tambahan style CampCode. Dimuat SETELAH css/main.css. */
+
+.status-badge {
+    display: inline-block;
+    padding: .25rem .75rem;
+    border-radius: 999px;
+    font-size: .85rem;
+    font-weight: 600;
+    line-height: 1.4;
+    white-space: nowrap;
+}
+.status-waiting  { background: #fff4d6; color: #8a6100; }
+.status-paid     { background: #dcf5e5; color: #13794a; }
+.status-canceled { background: #fde2e2; color: #b42318; }
+
+.benefit-list { list-style: none; padding: 0; margin: 1.25rem 0 0; }
+.benefit-list li { position: relative; padding-left: 1.6rem; margin-bottom: .45rem; }
+.benefit-list li::before {
+    content: "\2713";
+    position: absolute;
+    left: 0;
+    color: #13794a;
+    font-weight: 700;
+}
+
+.price-tag { font-size: 1.5rem; font-weight: 600; margin: 1rem 0 0; }
+
+.sim-note {
+    font-size: .85rem;
+    color: #6c757d;
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: .6rem .85rem;
+}
+
+.summary-card {
+    border: 1px solid #e9ecef;
+    border-radius: 12px;
+    padding: 1rem 1.25rem;
+    text-align: center;
+    height: 100%;
+}
+.summary-card h3 { margin: 0; }
+
+.filter-bar .form-select,
+.filter-bar .form-control { min-width: 200px; }
+
+.invoice-meta dt { font-weight: 500; color: #6c757d; }
+
+@media print {
+    .navbar, .no-print, .alert { display: none !important; }
+}

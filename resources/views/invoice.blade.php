@@ -1,12 +1,8 @@
 @extends('layout.app')
 
-@section('content')
-<style>
-    @media print {
-        .navbar, .no-print { display: none !important; }
-    }
-</style>
+@section('title', 'Invoice ' . $checkout->invoice_number)
 
+@section('content')
 <section class="my-5">
     <div class="container">
         <div class="row justify-content-center">
@@ -17,7 +13,9 @@
                         <h2 class="primary-header">{{ $checkout->invoice_number }}</h2>
                         <p class="mb-0">{{ $checkout->created_at->format('F d, Y') }}</p>
                     </div>
-                    <strong class="{{ $checkout->status_class }}">{{ $checkout->status_label }}</strong>
+                    <span class="{{ $checkout->payment_status->badgeClass() }}">
+                        {{ $checkout->payment_status->label() }}
+                    </span>
                 </div>
 
                 <div class="mb-5">
@@ -29,28 +27,31 @@
                     @endif
                 </div>
 
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <th>Bootcamp</th>
-                            <th class="text-end">Price</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>{{ $checkout->camp->title }}</td>
-                            <td class="text-end">${{ number_format($checkout->camp->price) }}</td>
-                        </tr>
-                        <tr>
-                            <td class="text-end"><strong>Total</strong></td>
-                            <td class="text-end"><strong>${{ number_format($checkout->camp->price) }}</strong></td>
-                        </tr>
-                    </tbody>
-                </table>
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Bootcamp</th>
+                                <th class="text-end">Price</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>{{ $checkout->camp->title }}</td>
+                                <td class="text-end">{{ $checkout->amount_formatted }}</td>
+                            </tr>
+                            <tr>
+                                <td class="text-end"><strong>Total</strong></td>
+                                <td class="text-end"><strong>{{ $checkout->amount_formatted }}</strong></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
 
-                <p class="mt-4">
-                    Kartu: **** **** **** {{ substr($checkout->card_number, -4) }}
-                </p>
+                <p class="mt-4 mb-1">Kartu: {{ $checkout->masked_card }}</p>
+                @if ($checkout->paid_at)
+                    <p class="mb-0">Dibayar pada: {{ $checkout->paid_at->format('F d, Y H:i') }}</p>
+                @endif
 
                 <div class="no-print mt-5 d-flex gap-2">
                     <button onclick="window.print()" class="btn btn-primary">Print</button>

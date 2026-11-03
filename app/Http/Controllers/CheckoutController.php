@@ -2,12 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\PaymentStatus;
+use App\Http\Requests\StoreCheckoutRequest;
 use App\Mail\Checkout\AfterCheckout;
 use App\Models\Camp;
-use App\Models\Checkout;
-use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\View\View;
@@ -16,44 +15,32 @@ class CheckoutController extends Controller
 {
     public function create(Camp $camp): View
     {
+        $camp->load('benefits');
+
         return view('checkout', ['camp' => $camp]);
     }
 
-    public function store(Request $request, Camp $camp): RedirectResponse
+    public function store(StoreCheckoutRequest $request, Camp $camp): RedirectResponse
     {
-        $data = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'occupation' => ['required', 'string', 'max:255'],
-            'card_number' => ['required', 'digits_between:13,19'],
-            'expired' => ['required', 'regex:/^(0[1-9]|1[0-2])\/(\d{2}|\d{4})$/'],
-            'cvc' => ['required', 'digits_between:3,4'],
-        ]);
-
-        $expired = Carbon::createFromFormat(
-            strlen($data['expired']) === 5 ? '!m/y' : '!m/Y',
-            $data['expired']
-        )->endOfMonth();
-
-        if ($expired->isPast()) {
-            return back()
-                ->withErrors(['expired' => 'Kartu sudah kedaluwarsa.'])
-                ->withInput();
-        }
-
+        $data = $request->validated();
         $user = $request->user();
 
-        $hasPending = $user->checkouts()
-            ->where('camp_id', $camp->id)
-            ->where('payment_status', Checkout::WAITING)
-            ->exists();
+        $checkout = DB::transaction(function () use ($user, $camp, $data, $request) {
+            // Satu user hanya boleh punya satu tagihan aktif (waiting/paid) per camp.
+            $existing = $user->checkouts()
+                ->where('camp_id', $camp->id)
+                ->whereIn('payment_status', [
+                    PaymentStatus::Waiting->value,
+                    PaymentStatus::Paid->value,
+                ])
+                ->latest()
+                ->lockForUpdate()
+                ->first();
 
-        if ($hasPending) {
-            return back()
-                ->withErrors(['camp' => 'Kamu masih punya tagihan menunggu pembayaran untuk bootcamp ini.'])
-                ->withInput();
-        }
+            if ($existing) {
+                return $existing;
+            }
 
-        $checkout = DB::transaction(function () use ($user, $camp, $data, $expired) {
             $user->update([
                 'name' => $data['name'],
                 'occupation' => $data['occupation'],
@@ -61,12 +48,22 @@ class CheckoutController extends Controller
 
             return $user->checkouts()->create([
                 'camp_id' => $camp->id,
-                'card_number' => $data['card_number'],
-                'expired' => $expired,
-                'cvc' => $data['cvc'],
-                'payment_status' => Checkout::WAITING,
+                'card_last_four' => substr($data['card_number'], -4),
+                'amount' => $camp->price,
+                'expired' => $request->expiryDate(),
+                'payment_status' => PaymentStatus::Waiting,
             ]);
         });
+
+        if (! $checkout->wasRecentlyCreated) {
+            $message = $checkout->payment_status === PaymentStatus::Paid
+                ? 'Kamu sudah terdaftar di bootcamp ini.'
+                : 'Kamu masih punya tagihan menunggu pembayaran untuk bootcamp ini.';
+
+            return back()
+                ->withErrors(['camp' => $message])
+                ->withInput($request->safe()->except(['card_number', 'cvc']));
+        }
 
         try {
             Mail::to($user->email)->send(new AfterCheckout($checkout));
@@ -74,7 +71,9 @@ class CheckoutController extends Controller
             report($e);
         }
 
-        return redirect()->route('success_checkout');
+        return redirect()
+            ->route('success_checkout')
+            ->with('invoice', $checkout->id);
     }
 
     public function success(): View

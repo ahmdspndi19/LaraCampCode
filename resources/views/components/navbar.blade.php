@@ -13,6 +13,17 @@
                 <li class="nav-item"><a class="nav-link" href="{{ route('welcome') }}#steps">Mentor</a></li>
                 <li class="nav-item"><a class="nav-link" href="{{ route('welcome') }}#pricing">Pricing</a></li>
                 <li class="nav-item"><a class="nav-link" href="{{ route('welcome') }}#testimonials">Business</a></li>
+                @auth
+                    <li class="nav-item">
+                        @if (auth()->user()->is_admin)
+                            <a class="nav-link {{ request()->routeIs('admin.*') ? 'active' : '' }}"
+                                href="{{ route('admin.dashboard') }}">Admin</a>
+                        @else
+                            <a class="nav-link {{ request()->routeIs('dashboard') ? 'active' : '' }}"
+                                href="{{ route('dashboard') }}">My Bootcamps</a>
+                        @endif
+                    </li>
+                @endauth
             </ul>
 
             @auth

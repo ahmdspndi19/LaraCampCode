@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\PaymentStatus;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -11,22 +12,26 @@ class Checkout extends Model
 {
     use HasFactory, SoftDeletes;
 
-    public const WAITING = 'waiting';
-    public const PAID = 'paid';
-    public const CANCELED = 'canceled';
-
+    // Nomor kartu penuh dan CVC TIDAK disimpan. Hanya 4 digit terakhir.
+    // "amount" adalah snapshot harga saat checkout, jadi invoice lama
+    // tidak berubah walaupun harga camp diubah.
     protected $fillable = [
         'user_id',
         'camp_id',
-        'card_number',
+        'card_last_four',
+        'amount',
         'expired',
-        'cvc',
         'payment_status',
+        'paid_at',
     ];
 
     protected function casts(): array
     {
-        return ['expired' => 'date'];
+        return [
+            'expired' => 'date',
+            'paid_at' => 'datetime',
+            'payment_status' => PaymentStatus::class,
+        ];
     }
 
     public function user(): BelongsTo
@@ -34,31 +39,23 @@ class Checkout extends Model
         return $this->belongsTo(User::class)->withTrashed();
     }
 
-    public function getInvoiceNumberAttribute(): string
-    {
-        return 'INV-' . str_pad((string) $this->id, 5, '0', STR_PAD_LEFT);
-    }
-
-    public function getStatusClassAttribute(): string
-    {
-        return match ($this->payment_status) {
-            self::PAID => 'text-green',
-            self::CANCELED => 'text-red',
-            default => '',
-        };
-    }
-
     public function camp(): BelongsTo
     {
         return $this->belongsTo(Camp::class)->withTrashed();
     }
 
-    public function getStatusLabelAttribute(): string
+    public function getInvoiceNumberAttribute(): string
     {
-        return match ($this->payment_status) {
-            self::PAID => 'Success',
-            self::CANCELED => 'Canceled',
-            default => 'Waiting for Payment',
-        };
+        return 'INV-' . str_pad((string) $this->id, 5, '0', STR_PAD_LEFT);
+    }
+
+    public function getAmountFormattedAttribute(): string
+    {
+        return 'Rp ' . number_format((int) $this->amount, 0, ',', '.');
+    }
+
+    public function getMaskedCardAttribute(): string
+    {
+        return '**** **** **** ' . $this->card_last_four;
     }
 }

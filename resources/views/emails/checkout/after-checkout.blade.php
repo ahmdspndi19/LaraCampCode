@@ -8,8 +8,8 @@ Checkout kamu sudah kami terima. Selesaikan pembayaran agar bootcamp aktif.
 | :--- | :--- |
 | Invoice | {{ $checkout->invoice_number }} |
 | Bootcamp | {{ $checkout->camp->title }} |
-| Total | ${{ number_format($checkout->camp->price) }} |
-| Status | {{ $checkout->status_label }} |
+| Total | {{ $checkout->amount_formatted }} |
+| Status | {{ $checkout->payment_status->label() }} |
 </x-mail::table>
 
 <x-mail::button :url="route('invoice', $checkout)">

@@ -7,8 +7,8 @@ Halo, {{ $checkout->user->name }}. Pembayaran untuk **{{ $checkout->camp->title 
 | Item | Detail |
 | :--- | :--- |
 | Invoice | {{ $checkout->invoice_number }} |
-| Total | ${{ number_format($checkout->camp->price) }} |
-| Status | {{ $checkout->status_label }} |
+| Total | {{ $checkout->amount_formatted }} |
+| Status | {{ $checkout->payment_status->label() }} |
 </x-mail::table>
 
 <x-mail::button :url="route('dashboard')">

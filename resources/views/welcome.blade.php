@@ -200,7 +200,7 @@
                                         {{ strtoupper($camp->title) }}
                                     </p>
                                     <h1 class="price text-center">
-                                        ${{ $camp->price_k }}
+                                        Rp {{ $camp->price_k }}
                                     </h1>
 
                                     @foreach ($camp->benefits as $benefit)

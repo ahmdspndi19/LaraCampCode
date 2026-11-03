@@ -13,8 +13,10 @@ class User extends Authenticatable
 {
     use HasFactory, Notifiable, SoftDeletes;
 
+    // is_admin sengaja TIDAK mass-assignable supaya tidak bisa diisi
+    // lewat request. Set lewat forceFill() di seeder / tinker.
     protected $fillable = [
-        'name', 'email', 'password', 'avatar', 'occupation', 'is_admin',
+        'name', 'email', 'password', 'avatar', 'occupation',
     ];
 
     protected function casts(): array
